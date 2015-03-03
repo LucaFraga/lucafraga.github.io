@@ -1,0 +1,128 @@
+@font-face {
+    font-family: 'wendyregular';
+    src: url('../font/wendy-webfont.eot');
+    src: url('../font/wendy-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/wendy-webfont.woff2') format('woff2'),
+         url('../font/wendy-webfont.woff') format('woff'),
+         url('../font/wendy-webfont.ttf') format('truetype'),
+         url('../font/wendy-webfont.svg#wendyregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+html, body {
+	margin:0;
+	padding:0;
+	width:100%;
+	height:100%;
+	background-color:black;
+	overflow: hidden;
+}
+body {
+	font-family: 'wendyregular';
+	color: white;
+	font-size: 22pt;
+}
+a, a:hover, a:active, a:visited{
+	color:white;
+}
+
+canvas {
+	image-rendering:optimizeSpeed;             /* Legal fallback */
+	image-rendering:-moz-crisp-edges;          /* Firefox        */
+	image-rendering:-o-crisp-edges;            /* Opera          */
+	image-rendering:pixelated; /* Safari         */
+	image-rendering:optimize-contrast;         /* CSS3 Proposed  */
+	image-rendering:crisp-edges;               /* CSS4 Proposed  */
+	image-rendering:pixelated;                 /* CSS4 Proposed  */
+	-ms-interpolation-mode:nearest-neighbor;   /* IE8+           */
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	/* bring your own prefixes */
+	transform: translate(-50%, -50%);
+	-ms-transform: translate(-50%, -50%);
+	-webikit-transform: translate(-50%, -50%);
+	max-width:100%;
+}
+
+#main{
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+}
+#button_container{
+	position: absolute;
+	left: 0px;
+	z-index:20;
+	left: 50%;
+	top: 2%;
+	/* bring your own prefixes */
+	transform: translate(-50%, 0);
+	-ms-transform: translate(-50%, 0);
+	-webikit-transform: translate(-50%, 0);
+	max-width:100%;
+	text-align: center;
+}
+#perk_left { opacity: .4;}
+#perk_container{
+	position: absolute;
+	bottom: 2%;
+	right: 0px;
+	z-index:20;
+	left: 50%;
+	/* bring your own prefixes */
+	transform: translate(-50%, 0);
+	-ms-transform: translate(-50%, 0);
+	-webikit-transform: translate(-50%, 0);
+	max-width:100%;
+	text-align: center;
+}
+.button{
+	width: 32px;
+	height:32px;
+	image-rendering:optimizeSpeed;             /* Legal fallback */
+	image-rendering:-moz-crisp-edges;          /* Firefox        */
+	image-rendering:-o-crisp-edges;            /* Opera          */
+	image-rendering:-webkit-optimize-contrast; /* Safari         */
+	image-rendering:optimize-contrast;         /* CSS3 Proposed  */
+	image-rendering:crisp-edges;               /* CSS4 Proposed  */
+	image-rendering:pixelated;                 /* CSS4 Proposed  */
+	-ms-interpolation-mode:nearest-neighbor;   /* IE8+           */
+	display: inline-block;
+	opacity: .4;
+	
+	
+
+}
+#score{
+	font-smooth: never;
+	-webkit-font-smoothing : none;
+	opacity:.4;
+}
+.button:hover{
+	opacity: 1;
+}
+#fullscreen_toggle{
+	background: url('../img/icon_fullscreen.gif');
+	background-size: 100%;
+}
+#audio_toggle{
+	background: url('../img/icon_audio.gif');
+	background-size: 100%;
+}
+#lights_toggle{
+	background: url('../img/icon_lights.gif');
+	background-size: 100%;
+}
+#pause_toggle{
+	background: url('../img/icon_pause.gif');
+	background-size: 100%;
+}
+#reset_button{
+	background: url('../img/icon_reset.gif');
+	background-size: 100%;
+}
+

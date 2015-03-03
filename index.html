@@ -1,0 +1,288 @@
+<!--
+	Trippy Snake - A 3D snake with silly lights.
+	
+	PLEASE don't use this as a reference for good code, I was just
+	playing with three.js for the first time and came up with this.
+	This code is awful, dirty and will eat your face if you ever 
+	attempt to learn too much from this.
+	Homwever, I release this code as ABSOLUTELY FREE and with no
+	particular license, so do what the hell you want and credit me
+	only if you feel like it. Goodbye :3
+	
+	@author Corigliano Luca <luca.corigliano@outlook.com>
+-->
+
+<html>
+	<head>
+		<!-- for Google -->
+		<meta name="description" content="Trippy Snake web browser game" />
+		<meta name="keywords" content="Snake, Trippy, Lights, Shadows, Three.js, 3d, webgl, experiment" />
+
+		<meta name="author" content="Corigliano Luca" />
+		<meta name="copyright" content="2015 Corigliano Luca" />
+		<meta name="application-name" content="Trippy Snake" />
+
+		<!-- for Facebook -->          
+		<meta property="og:title" content="Trippy Snake - Play now" />
+		<meta property="og:type" content="game" />
+		<meta property="og:image" content="" />
+		<meta property="og:url" content="" />
+		<meta property="og:description" content="" />
+
+		<!-- for Twitter -->          
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content="" />
+		<meta name="twitter:description" content="" />
+		<meta name="twitter:image" content="" />
+		<title>Trippy Snake</title>
+		<link rel="stylesheet" type="text/css" href="css/main.css">
+		<link rel="stylesheet" type="text/css" href="css/main.css">
+		<script>if(typeof THREE == 'undefined') THREE = [];</script> <!-- Workaround for certain android chrome builds -->
+		<script src="js/three.min.js"></script>
+		<script src="js/TrippySnake.config.js"></script>
+		<script src="js/TrippySnake.functions.js"></script>
+		<script src="js/TrippySnake.events.js"></script>
+		<script src="js/stats.js"></script>
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0"> 
+	<body>
+		<!-- Requirements -->
+
+		<div id="main">
+			<div id="button_container">
+				<a href="#" class="button" id="fullscreen_toggle" ></a>
+				<a href="#" class="button" id="audio_toggle" ></a>
+				<a href="#" class="button" id="lights_toggle" ></a>
+				<a href="#" class="button" id="reset_button" ></a>
+				<a href="#" class="button" id="pause_toggle" ></a>
+				<br />
+				<span id="score">000</span>
+			</div>
+			<div id="perk_container">
+				<img src="img/icon_perk_speedup.gif" class="button" id="perk_icon"/><br />
+				<span id="perk_left">20</span>
+			</div>
+		</div>
+		
+		<script >	
+			console.log("TrippySnake.main.js Loaded");
+			
+			// Performance adeguation
+			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+				SHADOWMAP_TYPE = THREE.BasicShadowMap;
+				AMBIENT_LIGHT_ACTIVE = true;
+			}			
+			// End performance adeguation
+			
+			// Event binding
+			window.addEventListener("load", function(event) {
+				document.addEventListener('keydown', OnKeyDown);
+				renderer.domElement.addEventListener('touchstart', OnTouchStart);
+				if(isUpscaleWorkaround)
+					upscaledRenderer.addEventListener('touchstart', OnTouchStart);
+				document.getElementById("fullscreen_toggle").onclick = OnFullscreenToggle;
+				document.getElementById("audio_toggle").onclick = OnAudioToggle;
+				document.getElementById("lights_toggle").onclick = OnLightsToggle;
+				document.getElementById("reset_button").onclick = OnResetGame;
+				document.getElementById("pause_toggle").onclick = OnPauseToggle;
+				window.onresize = OnResize;
+				UpdateRendererSize(); // Workaround for firefox mobile
+
+			});		
+			var perks = {
+				SpeedUp : 0,
+				SlowDown : 1,
+				Blind : 2,
+				Forth : 3,
+			}
+			var perkIcons = [
+				"img/icon_perk_speedup.gif",
+				"img/icon_perk_slowdown.gif",
+				"img/icon_perk_blind.gif",
+				"img/icon_perk_forth.gif",
+			];			
+			var direction = {
+				Left : 0,
+				Up : 1,
+				Right : 2,
+				Down : 3,
+			}
+			
+			var currentPerk = -1;
+			var currentPerkDuration = 0;
+			
+
+			
+			// Three.js stuff
+			var scene, camera, renderer, ground;
+			var gameContainer = document.getElementById("main");
+			var scoreContainer = document.getElementById("score");
+			
+			var perkContainer = document.getElementById("perk_container");
+			var perkIcon = document.getElementById("perk_icon");
+			var perkLeft = document.getElementById("perk_left");
+			
+			var upscaleFactor = 1;
+			var isAmbientLight = AMBIENT_LIGHT_ACTIVE;		
+			
+			// Game actors
+			var spotLights = [];
+			var snakeMembers = [];
+			var fruits = [];
+			var mobileAmbientLight = new THREE.AmbientLight(MOBILE_AMBIENT_LIGHT_COLOR); // for dim displays
+			
+			// Calculated scene stuff
+			var halfFieldWidth = FIELD_WIDTH/2;
+			var halfFieldHeight = FIELD_HEIGHT/2;		
+			
+			// Materials
+			var snakeMaterial = new THREE.MeshPhongMaterial(  { ambient: GLOBAL_AMBIENT_COLOR, color: SNAKE_COLOR, specular: GLOBAL_SPECULAR_COLOR, shininess: CUBE_SHININESS, shading: THREE.NoShading } );
+			var groundMaterial = new THREE.MeshPhongMaterial(  { ambient: GLOBAL_AMBIENT_COLOR, color: GROUND_COLOR, specular: GLOBAL_SPECULAR_COLOR, shininess: GROUND_SHININESS, shading: THREE.NoShading } );
+			
+			// Geometries
+			var cubeGeometry = new THREE.BoxGeometry( SNAKE_CUBE_SIZE, SNAKE_CUBE_SIZE, SNAKE_CUBE_SIZE	);
+			var sphereGeometry = new THREE.SphereGeometry( SNAKE_CUBE_SIZE, 5, 5	);
+			var groundGeo = new THREE.PlaneBufferGeometry( FIELD_WIDTH + FIELD_ADDITIONAL_MARGIN, FIELD_HEIGHT +FIELD_ADDITIONAL_MARGIN );
+			
+			// Game logic
+			var frameCounter = 0;
+			var currentDirection = direction.Right;
+			var isGameOver = false;
+			var isPaused = false;
+			var canChangeDirection = true;
+			var score = 0;
+			var nextScore = SCORE_PER_FRUIT;
+			var currentMoveFrame = MOVE_FRAME;
+			
+			var baseLoop = new Audio('http://incompetech.com/music/royalty-free/mp3-royaltyfree/8bit%20Dungeon%20Boss.mp3'); 
+			
+			// Music loop
+			if (typeof baseLoop.loop == 'boolean')
+			{
+				baseLoop.loop = true;
+			}
+			else
+			{
+				baseLoop.addEventListener('ended', function() {
+					this.currentTime = 0;
+					this.play();
+				}, false);
+			}
+			//baseLoop.play();
+			
+			// Arrays of values used through the game
+			var fruitColors = [
+				0x629806,
+				0xEEBD01,
+				0xE36F0A,
+				0xFA584D,
+				0xB0C157,
+				0x34364B,
+				0xF03F57,
+				0xCA0414,
+				0xD8DC4A,
+				0xFDA365,
+				0xFEE13B,
+				0x951D38,
+				0x5C9510,
+			]
+			
+			var cornerVectors = [
+				new THREE.Vector3(-halfFieldWidth, -halfFieldHeight, SPOTLIGHT_HEIGHT),
+				new THREE.Vector3(halfFieldWidth, -halfFieldHeight, SPOTLIGHT_HEIGHT),
+				new THREE.Vector3(halfFieldWidth, halfFieldHeight, SPOTLIGHT_HEIGHT),
+				new THREE.Vector3(-halfFieldWidth, halfFieldHeight, SPOTLIGHT_HEIGHT),
+			]
+			
+			scene = new THREE.Scene();
+			camera = new THREE.PerspectiveCamera( 30, RENDERER_RATIO_2, 0.1, 50 );
+			renderer = new THREE.WebGLRenderer({ antialias:false, alpha:false });
+			renderer.maxLights = 20;
+			renderer.shadowMapEnabled	= true;
+			renderer.shadowMapType 		= SHADOWMAP_TYPE;
+			
+
+			// FPS Counter define
+			var stats = new Stats();
+			stats.setMode(0); // 0: fps, 1: ms
+			
+			// align top-left
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.left = '0px';
+			stats.domElement.style.top = '0px';
+			
+			camera.position.z = 30;
+			camera.position.x = 0;
+			camera.position.y = 0;
+			
+			
+			
+			// Ground
+			groundMaterial.color.setHSL( 1,1,1 );
+
+			var ground = new THREE.Mesh( groundGeo, groundMaterial );
+			ground.position.y = 0;
+			ground.position.x = 0;
+			ground.position.z = -5;
+			
+			scene.add( ground );
+			if(isAmbientLight) scene.add(mobileAmbientLight);
+			ground.receiveShadow = true;	
+			ground.castShadow = true;	
+			
+			gameContainer.appendChild( renderer.domElement );
+			renderer.domElement.id = "game_renderer";
+
+			//document.body.appendChild( stats.domElement );	
+			
+			
+			CreateSpotlights();		
+			RestartGame();
+			
+			// Webkit / IE sharp upscaling workaround
+			
+			var isUpscaleWorkaround =  IsInternetExplorer()  || GetChromeVersion() < 41   ;
+			if(isUpscaleWorkaround) {
+				var upscaledRenderer = document.createElement("canvas");
+				upscaledRenderer.id = "upscaled_renderer";
+				var upscaledRendererCtx = upscaledRenderer.getContext("2d");
+				gameContainer.appendChild(upscaledRenderer);
+			}
+		
+			
+			UpdateRendererSize();
+			
+			// Rendering loop
+			function render() {
+				stats.begin();
+				var realMoveFrame = currentMoveFrame;
+				if(HasPerk()) {
+					if(currentPerk == perks.SpeedUp)
+						realMoveFrame /= 2;
+					else if(currentPerk == perks.SlowDown)
+						realMoveFrame *= 2;
+				}
+							
+				if(++frameCounter >= realMoveFrame)
+				{
+					frameCounter = 0;
+					canChangeDirection = true;
+					if(!isGameOver && !isPaused) {
+						if(nextScore > SCORE_PER_FRUIT_MIN) nextScore -= SCORE_REMOVE_PER_LOGIC_FRAME;
+						SnakeMovement();
+						UpdateScoreCounter();
+						UpdatePerkDisplay();
+					}
+				}
+				AnimateSpotlights();	
+				requestAnimationFrame( render );
+				stats.end();
+				renderer.render( scene, camera );
+				if(isUpscaleWorkaround) {
+					upscaledRendererCtx.drawImage(renderer.domElement, 0, 0, upscaledRenderer.width, upscaledRenderer.height);
+				}
+			}
+
+			render();	
+		</script>
+	</body>
+</html>
