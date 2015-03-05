@@ -167,9 +167,19 @@ function CollidesWithCubeGroup(x, y, group)
 	}
 	return -1;
 }
-
-function SnakeMovement()
+var skipNextMovement = false;
+function SnakeMovement(force)
 {
+	var force = force === true;
+	
+	if(force) {
+		skipNextMovement = true;
+	} else {
+		if(skipNextMovement) {
+			skipNextMovement = false;
+			return;
+		}
+	}
 	// Game Logic
 	
 	// 1 . Determine the snake head target position

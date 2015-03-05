@@ -15,46 +15,49 @@ console.log("TrippySnake.events.js Loaded");
 
 // Keyboard input
 OnKeyDown = function(event) {
+	var oldDirection = currentDirection;
 	if(!canChangeDirection) return;
 	
-	switch(event.keyCode){
-		case 37: // Left
-		case 65:
-			if(currentDirection == direction.Right) return;
-			currentDirection = direction.Left;
-			break;
-		case 38: // Up
-		case 87:
-			if(currentDirection == direction.Down) return;
-			currentDirection = direction.Up;
-			break;
-		case 39: // Right
-		case 68:
-			if(currentDirection == direction.Left) return;
-			currentDirection = direction.Right;
-			break;
-		case 40: // Down
-		case 83:
-			if(currentDirection == direction.Up) return;
-			currentDirection = direction.Down;
-			break;
-		case 70:
-			OnFullscreenToggle();
-			return;
-		case 80:
-			OnPauseToggle();
-			return;
-		case 76:
-			OnLightsToggle();
-			return;
-		case 77:
-			OnAudioToggle();
-			return;
-		case 82:
-			OnResetGame();
-			return;
+		switch(event.keyCode){
+			case 37: // Left
+			case 65:
+				if(currentDirection == direction.Right) return;
+				currentDirection = direction.Left;
+				break;
+			case 38: // Up
+			case 87:
+				if(currentDirection == direction.Down) return;
+				currentDirection = direction.Up;
+				break;
+			case 39: // Right
+			case 68:
+				if(currentDirection == direction.Left) return;
+				currentDirection = direction.Right;
+				break;
+			case 40: // Down
+			case 83:
+				if(currentDirection == direction.Up) return;
+				currentDirection = direction.Down;
+				break;
+			case 70:
+				OnFullscreenToggle();
+				return;
+			case 80:
+				OnPauseToggle();
+				return;
+			case 76:
+				OnLightsToggle();
+				return;
+			case 77:
+				OnAudioToggle();
+				return;
+			case 82:
+				OnResetGame();
+				return;
 	}
-	canChangeDirection = false;
+	if(!isPaused && !isGameOver && oldDirection != currentDirection){
+		SnakeMovement(true);
+	}
 }
   
 OnTouchStart = function(event) {
