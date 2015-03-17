@@ -1,0 +1,139 @@
+/* Common CSS */
+.blue_text{color: #144759;}
+.red_text{color:#970000;}
+
+
+
+
+html, body {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%; 
+}
+body {
+	font-family: 'Patua One', Helvetica, Arial, sans-serif; 
+	text-align:center;
+	background: url('http://api.thumbr.it/whitenoise-361x370.png?background=fffefaff&noise=adadad&density=15&opacity=13') ;
+}
+.cross{
+	position:relative;
+	left: 0; top: 0;
+	width: 100%; height: 100%;
+}
+.cross:before{
+	position:absolute;
+	content: '';
+	background-color: #970000;
+	width: 10%;
+	height: 80%;
+	
+	top: 10%;
+	left: 45%;
+	transform: rotate(45deg);
+}
+.cross:after{
+	position:absolute;
+	content: '';
+	background-color: #970000;
+	width: 10%;
+	height: 80%;
+	
+	top: 10%;
+	left: 45%;
+	transform: rotate(-45deg);
+}
+
+.game_cell:hover > .empty{
+	transform: rotate(180deg);
+	opacity: 1;
+	
+}
+.empty{
+
+	width: 70%;
+	height: 70%;
+	opacity: 0;
+	margin: 0 auto;
+	background-color: rgba(0,0,0,0.2);
+	border-radius: 50%;
+	transition-duration: 0.1s;
+}
+
+#circle_panel, #cross_panel {
+	position:fixed;
+	text-align: center;
+}
+
+#restart, #restart:hover, #restart:active, #restart:visited{
+	text-decoration:none !important;
+	color: #144759 !important;
+	display:none;
+}
+.symbol_owner_you:before{
+	content: 'YOU';
+}
+.symbol_owner_opp:before{
+	content: 'OPP';
+}
+.score{
+	margin-top: -20%;
+	
+}
+.turn{ margin-top: -10%;}
+.current_turn:before {
+	content: '^';
+}
+
+.circle{
+	background-color: transparent;
+	border: 8px solid #144759;
+	border-radius: 50%;
+	position:relative;
+	margin: 0 auto;
+	width: 50%;
+	height: 50%;
+}
+
+#game_table {
+	position:absolute;
+}
+#game_table {
+	border: none;
+	border-collapse: collapse;	
+	
+}
+#game_table td, #game_table th {
+	border: 6px solid #222;
+}
+#game_table tr:first-child th {
+	border-top: 0;
+}
+#game_table tr:last-child td {
+	border-bottom: 0;
+}
+#game_table tr td:first-child,
+#game_table tr th:first-child {
+	border-left: 0;
+}
+#game_table tr td:last-child,
+#game_table tr th:last-child {
+	border-right: 0;
+}
+
+/* Overlay */
+#overlay{
+	z-index: 999;
+	position:absolute;
+	width: 100%;
+	height: 100%;
+	text-align:center;
+	background-color: rgba(255,255,255,0.9);
+	color: #222;
+	font-size: 20pt;
+}
+#overlay_container{
+	width: 100%;
+	height: auto;
+	position: absolute;
+}
