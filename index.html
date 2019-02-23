@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hello Bulma!</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+    <script src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  </head>
+  <body>
+  <section class="section">
+    <div class="container">
+    </div>
+  </section>
+  <script defer>
+		/* Configuration - Edit as needed */
+		var entries = {
+			Info : {type:'separator'},
+			Nome : {type:'text',default_value:'Giocatore',current_value:null},
+			Razza : {type:'text',default_value:'Umano',current_value:null},
+			Stato : {type:'separator'},
+			PS : {type:'number',default_value:100,current_value:null},
+			PM : {type:'number',default_value:50,current_value:null},
+			Stamina : {type:'number',default_value:100,current_value:null},
+			Note : {type:'text',default_value:'',current_value:null},
+			Build : {type:'separator'},
+			Livello : {type:'number',default_value:1,current_value:null},
+			EXP : {type:'number',default_value:0,current_value:null},
+			Forza : {type:'number',default_value:0,current_value:null},
+			Destrezza: {type:'number',default_value:0,current_value:null},
+			Intelligenza : {type:'number',default_value:0,current_value:null},
+			Saggezza : {type:'number',default_value:0,current_value:null},
+
+		};
+
+		/* Custom logic - Edit as needed */
+
+
+		/* Load/Save logic - You can leave this as-is */
+
+		function createElement(name, type, default_value, container) {
+			var friendlyName = name.replace('_', ' ')
+			var html = "";
+      var attrs = "";
+      var pre_addons = "";
+      var post_addons = "";
+      var addons = "";
+			if(type === 'separator') {
+          html = `<h3>${friendlyName}</h3>`;
+			} else {
+        if(type ==='number') {
+          attrs += 'readonly ';
+          pre_addons = `<div class="control">
+              <a class="button minus_five">
+                <<
+              </a>
+            </div>
+            <div class="control">
+                <a class="button minus_one">
+                  <
+                </a>
+            </div>`;
+            post_addons = `<div class="control">
+                <a class="button plus_one">
+                  >
+                </a>
+              </div>
+              <div class="control">
+                  <a class="button plus_five">
+                    >>
+                  </a>
+              </div>`;
+      }
+
+        if(pre_addons !== "" || post_addons !== "") {
+          addons = "has-addons";
+        }
+				html = `<div class="field is-horizontal" id="${name}_field">
+                  <div class="field-label is-normal">
+                      <label class="label">${friendlyName}</label>
+                  </div>
+                  <div class="field-body">
+                    <div class="field ${addons}" data-item="${name}">
+                      ${pre_addons}
+                      <div class="control is-expanded">
+                        <input class="input" id="${name}_input" ${attrs} type="${type}" placeholder="${friendlyName}" value="${default_value}">
+                      </div>
+                      ${post_addons}
+                    </div>
+                  </div>
+						</div>`;
+			}
+			container.append(html);
+		}
+		function setValue(name, value) {
+			var selector = $("input#${name}_input");
+			selector.value(value);
+		}
+
+		function initialize() {
+			var container = $(".container");
+			for (var key in entries) {
+				// check if the property/key is defined in the object itself, not in parent
+				if (entries.hasOwnProperty(key)) {
+					var value = entries[key];
+					createElement(key, value.type, value.default_value, container);
+				}
+			}
+		}
+
+		$("document").ready(initialize);
+
+	</script>
+  </body>
+</html>
