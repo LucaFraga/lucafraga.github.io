@@ -3,13 +3,44 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hello Bulma!</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
-    <script src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <title>D&C Status</title>
+    <link rel="stylesheet" href="bulma.min.css">
+    <script src="all.js"></script>
+	<script src="jquery.min.js"></script>
   <style>
+    section {
+      padding-top: 1rem !important;
+    }
     body {
-      background-
+      background-color: rgb(248, 232, 213);
+    }
+    label.label {
+      color: rgb(108, 48, 22) !important;
+    }
+    input.input {
+      background-color: rgba(255,255,255,0.6);
+      border: 1px solid rgb(120, 10,10);
+    }
+    button.reset {
+      background-color: rgba(200,200,100, 0.3);
+      border: 1px solid rgb(120, 10,10);
+    }
+    button.minus {
+      background-color: rgba(255,100,100, 0.1);
+      border: 1px solid rgb(120, 10,10);
+    }
+    button.plus {
+      background-color: rgba(100,255,100, 0.1);
+      border: 1px solid rgb(120, 10,10);
+    }
+    input.is-static,  .button.is-static {
+      background: linear-gradient(to right, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 10rem);
+      border: 1px solid rgba(120,10,10,0.2) !important;
+      padding-left: 1rem !important;
+
+    }
+    .button.is-static {
+      border-right:none !important;
     }
   </style>
   </head>
@@ -21,155 +52,253 @@
   <script defer>
 		/* Configuration - Edit as needed */
 		var entries = {
-			Info : {type:'separator'},
-			Nome : {type:'text',current_value:'Giocatore'},
-			Razza : {type:'text',current_value:'Umano'},
-			Stato : {type:'separator'},
-      PS : {type:'number',current_value:100},
-			PS_MAX : {type:'readonly',current_value:100},
-      PM : {type:'number',current_value:30},
-      PM_MAX : {type:'readonly',current_value:30},
-      Attacco_Fisico : {type:'readonly',current_value:4},
-			Attacco_Magico : {type:'readonly',current_value:4},
-      Stamina : {type:'number',current_value:100},
-			Stamina_MAX : {type:'readonly',current_value:100},
-			Note : {type:'text',current_value:''},
-			Build : {type:'separator'},
-			Livello : {type:'number',current_value:1},
-      Esperienza : {type:'number',current_value:0},
-			EXP_Livello : {type:'readonly',current_value:1000},
-      Bonus_PS : {type:'number',current_value:0},
-      Bonus_PM: {type:'number',current_value:0},
-			Forza : {type:'number',current_value:0},
-			Destrezza: {type:'number',current_value:0},
-			Intelligenza : {type:'number',current_value:0},
-			Saggezza : {type:'number',current_value:0},
-      Bonus_Equipaggiamento : {type:'separator'},
-      PS_Equip : {type:'number',current_value:0},
-      PM_Equip : {type:'number',current_value:0},
-      ATK_Equip : {type:'number',current_value:0},
-      ATK_Magico_Equip : {type:'number',current_value:0},
+			info : {type:'separator', name: "Informazioni"},
+			name : {type:'text',current_value:'Giocatore', name: "Nome"},
+			race : {type:'text',current_value:'Umano', name: "Razza"},
+      ////////
+      status : {type:'separator', name: "Stato"},
+      hp : {type:'number',current_value:100, name: "Punti salute"},
+			max_hp : {type:'readonly_attach',current_value:100, name: "PS massimi"},
+      smallSep3 : {type:'separator_small', name: ""},
+      sp : {type:'number',current_value:30, name: "Punti magia"},
+      max_sp : {type:'readonly_attach',current_value:30, name: "PM massimi"},
+      smallSep4 : {type:'separator_small', name: ""},
+      max_atk : {type:'readonly',current_value:4, name: "Valore d'attacco"},
+			max_atkm : {type:'readonly',current_value:4, name: "Val. attacco magia"},
+      smallSep6 : {type:'separator_small', name: ""},
+      stamina : {type:'number',current_value:100, name: "Stamina"},
+			max_stamina : {type:'readonly_attach',current_value:50, name: "Stamina massima"},
+			status_effect : {type:'text',current_value:'', name:"Status"},
+      ////////
+      build : {type:'separator', name: "Build"},
+			level : {type:'number',current_value:1, name:"Livello"},
+      exp : {type:'number',current_value:0, name:"Esperienza"},
+			next_exp : {type:'readonly',current_value:1000, name:"EXP per livello"},
+      exp_mul : {type:'float',current_value:0, name:"Moltiplicatore EXP"},
+      ////////
+      smallSep1 : {type:'separator_small', name: ""},
+      respect : {type: 'number', current_value: 0, name:"Peso trasportato"},
+      max_weight : {type: 'number', current_value: 50, name:"Peso trasportabile"},
+      smallSep5 : {type:'separator_small', name: ""},
+      charm : {type: 'number', current_value: 0, name:"Rispetto"},
+      weight : {type: 'number', current_value: 0, name:"Carisma"},
+
+      smallSep2 : {type:'separator_small', name: ""},
+      ///////
+      hp_points : {type:'number_percentage',current_value:0, name:"PS"},
+      sp_points : {type:'number_percentage',current_value:0, name:"PM"},
+      str_points : {type:'number_percentage',current_value:0, name:"Forza"},
+			stamina_points : {type:'number_percentage',current_value:0, name:"Stamina"},
+			dex_points: {type:'number_percentage',current_value:0, name:"Destrezza"},
+      wsd_points : {type:'number_percentage',current_value:0, name:"Saggezza"},
+      int_points : {type:'number_percentage',current_value:0, name:"Intelligenza"},
+			luck_points : {type:'number_percentage',current_value:0, name:"Fortuna"},
+      ///////
+      resistances : {type:'separator', name:"Resistenze (%)"},
+      atk_res : {type:'number',current_value:0, name:"Attacco fisico"},
+      fire_res : {type:'number',current_value:0, name:"Fuoco"},
+      water_res : {type:'number',current_value:0, name:"Acqua"},
+      thunder_res : {type:'number',current_value:0, name:"Tuono"},
+      wind_res : {type:'number',current_value:0, name:"Vento"},
+      light_res : {type:'number',current_value:0, name:"Luce"},
+      dark_res : {type:'number',current_value:0, name:"Oscurità"},
+      ///////
+      equip : {type:'separator', name:"Bonus equip"},
+      hp_equip : {type:'number',current_value:0, name:"PS"},
+      sp_equip : {type:'number',current_value:0, name:"PM"},
+      atk_equip : {type:'number',current_value:0, name:"Attacco"},
+      atkm_equip : {type:'number',current_value:0, name:"Attacco magico"},
+      stamina_equip : {type:'number',current_value:0, name:"Stamina"},
 		};
 
     /* Valori base */
-    var PS_BASE = 100;
-    var PS_LEVEL = 10;
-    var PS_POINTS = [0,0.05,0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50,0.55,0.60,0.65];
-    var PM_POINTS = [0,0.05,0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50,0.55,0.60,0.65];
-    var PM_BASE = 30;
-    var PM_LEVEL = 3;
-    function ricalcolaMP() {
-        var livello = parseInt(getValue("Livello"))-1;
-        var bonusPM = PM_POINTS[parseInt(getValue("Bonus_PM"))];
-        var PM_Equip = parseInt(getValue("PM_Equip"));
-
-        var result = PM_BASE + (livello * PM_LEVEL);
-        result += (result * bonusPM);
-        result += PM_Equip;
-        setValue("PM_MAX", Math.floor(result));
-
+    var stats = {
+      hp: {base: 100, level: 10, point: "hp_points", equip: "hp_equip"},
+      sp: {base: 30, level: 3, point: "sp_points", equip: "sp_equip"},
+      stamina: {base: 50, level: 5, point: "stamina_points", equip: "stamina_equip"},
+      atk: {base: 0, level: 1, point: "str_points", equip: "atk_equip"},
+      atkm: {base: 0, level: 1, point: "wsd_points", equip: "atkm_equip"},
+    };
+    var SCALING = [0,5,10,15,20,30,40,50,60,75,90,105,110,130,150,170,200,230,260,300,350];
+    function getScaling(i) {
+      if (i < 0) i = 0;
+      if (i >= SCALING.length) i = SCALING.length - 1;
+      return SCALING[i];
     }
-    function ricalcolaHP() {
-        var livello = parseInt(getValue("Livello"))-1;
-        var bonusPS = PS_POINTS[parseInt(getValue("Bonus_PS"))];
-        var PS_Equip = parseInt(getValue("PS_Equip"));
 
-        var result = PS_BASE + (livello * PS_LEVEL);
-        result += (result * bonusPS);
-        result += PS_Equip;
-        setValue("PS_MAX", Math.floor(result));
+    var preventRecursion = false;
 
+    function ricalcola(id) {
+      var level = getValueNum("level")-1;
+      var stat = stats[id];
+      var bonus = getScaling(Math.floor(getValueNum(stat.point)/5));
+      var equip = getValueNum(stat.equip);
+
+      var result = stat.base + (level * stat.level);
+      result += (result * bonus/100);
+      result += equip;
+      setValue("max_"+id, Math.floor(result));
+    }
+
+
+    function ricalcolaLivello()
+    {
+      var exp = getValueNum("exp");
+
+      if(exp >= getValueNum("next_exp")) {
+        preventRecursion = true;
+        setValue("level", getValueNum("level") + 1);
+        ricalcolaExp();
+        preventRecursion = false;
+      }
+    }
+    function ricalcolaExp()
+    {
+      var level = getValueNum("level");
+      preventRecursion = true;
+      setValue("next_exp", 1000*level);
+      setValue("exp", 0);
     }
 		/* Custom logic - Edit as needed */
     function onChange(element, name, value) {
-      if(name === 'Livello' || name === 'Bonus_PS' || name === 'PS_Equip')
-        ricalcolaHP();
-      if(name === 'Livello' || name === 'Bonus_PM' || name === 'PM_Equip')
-        ricalcolaMP();
-    }
-
-		/* Load/Save logic - You can leave this as-is */
-    function set(name, value) {
-
-    }
-		function createElement(name, type, default_value, container) {
-			var friendlyName = name.replace('_', ' ')
-			var html = "";
-      var attrs = "";
-      var cls = "";
-      var pre_addons = "";
-      var post_addons = "";
-      var inject = "";
-      var addons = "";
-			if(false) {
-          html = `<div class="has-text-centered"><h3 class="subtitle">${friendlyName}</h3></div>`;
-			} else {
-        if(type ==='number') {
-          //attrs += 'readonly ';
-          pre_addons = `<div class="control">
-              <a class="button minus_five" data-item="${name}_input">
-                <<
-              </a>
-            </div>
-            <div class="control">
-                <a class="button minus_one" data-item="${name}_input">
-                  <
-                </a>
-            </div>`;
-            post_addons = `<div class="control">
-                <a class="button plus_one" data-item="${name}_input">
-                  >
-                </a>
-              </div>
-              <div class="control">
-                  <a class="button plus_five" data-item="${name}_input">
-                    >>
-                  </a>
-              </div>`;
+      if(preventRecursion) {
+        preventRecursion = false;
+        return;
       }
-      if (type === 'readonly' ) {
-        attrs += 'readonly';
-        cls += 'is-static';
-      } else if(type === 'separator') {
-        cls += 'is-hidden';
-        inject = "--------------------";
-      }
-
-        if(pre_addons !== "" || post_addons !== "") {
-          addons = "has-addons";
+      console.log("onChange %s %s %s", element, name, value);
+      $.each(stats, function(k,v) {
+        if(name === 'level' || name === v.point || name === v.equip)
+          ricalcola(k);
+      });
+      if(name === 'level')
+        ricalcolaExp();
+      if(name === 'exp')
+        ricalcolaLivello();
+        // Builtin
+        if(name.includes("_points")) {
+          $(`#${name}_perc`).val(getScaling(Math.floor(value/5))+"%");
         }
-				html = `<div class="field is-horizontal" id="${name}_field">
-                  <div class="field-label is-normal">
-                      <label class="label">${friendlyName}</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field ${addons}" data-item="${name}_input">
-                      ${pre_addons}
-                      <div class="control is-expanded">
-                        ${inject}
-                        <input class="input ${cls}" id="${name}_input" ${attrs} type="${type}" placeholder="${friendlyName}" value="${default_value}" data-name="${name}">
-                      </div>
-                      ${post_addons}
-                    </div>
-                  </div>
-						</div>`;
-			}
-			container.append(html);
+    }
+
+		/* Load/Save/Render logic - Not part of the configuration */
+    function createField(id, name, container, size) {
+      if (size === undefined)
+        size = "normal";
+      // Create field
+      var f = $("<div>", {class: `field is-horizontal ${id}_field`}).appendTo(container);
+      // Create label
+      var tmp = $("<div>", {class: `field-label is-${size}`}).appendTo(f)
+      $("<label>",{class:"label"}).html(name).appendTo(tmp);
+
+      // Create body
+      tmp = $("<div>", {class :"field-body"}).appendTo(f);
+      tmp = $("<div>", {class :"field is-expanded"}).appendTo(tmp);
+      var b = $("<div>", {class :"field has-addons"}).appendTo(tmp);
+      return b;
+    }
+    function createText(id, value, name, container) {
+      var b = createField(id, name, container);
+
+      // Append input
+      b.append($("<p>", {class : "control is-expanded"}).append($("<input>", {id: id, class: "input", type: "text", value: value})));
+      return b;
+    }
+    function createReadonly(id, value, name, container, nofield) {
+      var b;
+      if (nofield){
+          b = container;
+          //b.append($("<p>", {class: "control"}).append($("<button>", {class: "button is-static"}).html("/")));
+      } else {
+          b = createField(id, name, container);
+      }
+      // Append input
+      b.append($("<p>", {class : "control is-expanded"}).append($("<input>", {id: id, readonly:'', class: "input is-static", type: "text", value: value})));
+      if(nofield) {
+        b.append($("<p>", {class : "control"}).append($("<button>", {class :"button reset-button reset", data :{ element : id}}).html("Reset")).appendTo(b));
+      }
+      return b;
+    }
+    function createSeparator(id, name, container) {
+      var b = createField(id, name, container, "large");
+      b.append("");
+      return b;
+    }
+    function createInteger(id, value, name, container, percentage, increments, decrements) {
+        if(increments === undefined){
+          increments = [1, 5];
+        }
+        if(percentage === undefined)
+          percentage = false;
+        if(decrements === undefined) {
+          decrements = [-5, -1];
+        }
+
+
+        var b = createField(id,name, container);
+        // Append Decrements
+        $.each(decrements, function(k, v) {
+          b.append($("<p>", {class : "control"}).append($("<button>", {class :"button integer-button minus", data :{change : v, element : id}}).html(v)));
+        });
+
+        // Append input
+        b.append($("<p>", {class : "control is-expanded"}).append($("<input>", {id: id, class: "input", type: "number", value: value})));
+
+        if(percentage) {
+          b.append($("<p>", {class : "control"}).append($("<input>", {id: `${id}_perc`, class: "input is-static", readonly: '', type: "text", value: getScaling(Math.floor(value/5))  + "%"})));
+        }
+
+        // Append decrements
+        $.each(increments, function(k, v) {
+          b.append($("<p>", {class : "control"}).append($("<button>", {class :"button integer-button plus", data :{change : v, element : id}}).html(`+${v}`)).appendTo(b));
+        });
+
+        return b;
+    }
+    var lastElement = null;
+		function createElement(id, type, value, name, container) {
+
+	     if(type === "number")
+        lastElement = createInteger(id, value, name, container);
+      else if(type === "float")
+        lastElement = createInteger(id, value, name, container, false, [.1,.5], [-.1, -.5]);
+       else if(type === "number_percentage")
+        lastElement = createInteger(id, value, name, container, true);
+       else if(type === "readonly")
+        lastElement = createReadonly(id, value, name, container);
+        else if(type === "readonly_attach")
+        lastElement = createReadonly(id, value, name, lastElement,true);
+       else if(type === "separator")
+        lastElement = createSeparator(id, name, container);
+        else if(type === "separator_small")
+        lastElement = createSeparator(id, "", container);
+       else if(type === "text")
+        lastElement = createText(id, value, name, container);
 		}
+    function getValueNum(name) {
+      return parseFloat(getValue(name));
+    }
     function getValue(name) {
       return entries[name].current_value;
     }
 		function setValue(name, value) {
-      var el = $(`#${name}_input`)
+      var el = $(`input#${name}`)
       el.val(value);
       el.trigger("change");
 		}
-
-    function changeVal(e,i) {
-      var selector = $(e.target).data('item');
-      var el = $(`#${selector}`)
-      var val = parseInt(el.val());
-      el.val(val+i);
+    function resetVal(e) {
+      var selector = $(e.target).data('element').replace("max_", "");
+      var el0 = $(`#${selector}`);
+      var el1 = $(`#max_${selector}`);
+      var val = parseFloat(el1.val());
+      el0.val(val);
+      el0.trigger("change");
+    }
+    function changeVal(e) {
+      var selector = $(e.target).data('element');
+      var change = parseFloat($(e.target).data('change'));
+      var el = $(`#${selector}`);
+      var val = parseFloat(el.val());
+      el.val(val+change);
       el.trigger("change");
     }
     function saveData() {
@@ -178,7 +307,7 @@
 				// check if the property/key is defined in the object itself, not in parent
 				if (entries.hasOwnProperty(key)) {
           if (entries[key].type === "separator") continue;
-					var currentValue = $(`input#${key}_input`).val();
+					var currentValue = $(`input#${key}`).val();
 
           entries[key].current_value = currentValue;
 				}
@@ -204,20 +333,18 @@
           var currentValue = value.current_value;
           if(savedData !== null && savedData.hasOwnProperty(key))
             currentValue = savedData[key].current_value;
-					createElement(key, value.type, currentValue, container);
+					createElement(key, value.type, currentValue, value.name, container);
 				}
 
 
 			}
 
-      $('.button.plus_one').click(function(e){changeVal(e,1)});
-      $('.button.plus_five').click(function(e){changeVal(e,5)});
-      $('.button.minus_one').click(function(e){changeVal(e,-1)});
-      $('.button.minus_five').click(function(e){changeVal(e,-5)});
+      $('.button.integer-button').click(function(e){changeVal(e)});
+      $('.button.reset-button').click(function(e){resetVal(e)});
       $('input').change(saveData);
       $('input').change(function(e) {
             var el = $(e.target);
-            onChange(el, el.data('name'), el.val());
+            onChange(el, el.prop("id"), el.val());
       });
 		}
 
